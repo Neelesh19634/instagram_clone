@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.6.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .image{
+        overflow: hidden; 
+        width: 200px; 
+         height: 200px; 
+        border-radius:50%; 
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+      <div class="flex justify-between items-center px-4">
+        <a class="text-lg text-blue-500" href="/profile"><i class="ri-arrow-left-s-line"></i> profile</a>
+        <h2 class="leading-none text-xl">Edit Profile</h2>
+        <a class="text-lg" href="/feed"><i class="ri-home-line"></i> home</a>
+      </div>
+      <div class="flex flex-col items-center gap-2 mt-20">
+        <div class="image">
+          <img class="w-full h-full object-cover" src="/images/uploads/<%=user.profile%>" alt="">
+        </div>
+        <button id="editbtn" class="text-blue-500 capitalize">edit picture</button>
+      </div>
+      <div class="gap-5 px-4 mt-20 w-full">
+        <h3 class="text-lg leading-none">Edit Account Details</h3>
+        <hr class="opacity-30 my-3">
+        <form class="w-full" action="/update" method="post" enctype="multipart/form-data" id="form">
+          <input hidden type="file" name="image" id="input">
+          <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="username" name="username" value="<%=user.username%>">
+          <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="name" name="name" value="<%=user.name%>">
+          <textarea class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900 resize-none" placeholder="Bio" name="bio" value="<%=user.bio%>"></textarea>
+          <input class="w-full bg-blue-500 px-3 py-3 rounded-md mt-2" type="submit" value="Update Details" id="btn">
+        </form>
+      </div>
+    </div>
+    <% include ./partials/footer.ejs %>
+
+    <script>
+     document.querySelector("#editbtn").addEventListener("click",()=>{
+      document.querySelector("#input").click();
+     })
+     document.querySelector("#btn").addEventListener("click",()=>{
+      document.querySelector("#form").submit();
+     })
+
+      
+
+  
+    
+    </script>
+  </body>
+</html>

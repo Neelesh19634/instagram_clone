@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.6.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+   
+</head>
+<body>
+    <div class="w-full min-h-screen bg-zinc-900 px-4 py-5">
+        <div class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 rounded-md">
+            <i class="text-white ri-search-line"></i>
+            <input class="input ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text"
+                placeholder="search username">
+        </div>
+        <div class="users">
+          
+        </div>
+    </div>
+    <% include ./partials/footer.ejs %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      const inp=document.querySelector(".input");
+      
+        inp.addEventListener("input", ()=>{
+
+            axios.get(`/username/${inp.value}`)
+            .then(function(data){
+                console.log(data);
+                let clutter=" ";
+                data.data.forEach(function(elem){
+                 clutter +=`  <a href="/profile/${elem.username}" class="outline-none">
+                <div class="text-white flex items-center gap-2 mt-5">
+                    <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100 overflow-hidden">
+                        <img src="/images/uploads/${elem.profile}"> alt="">
+                        </div>
+                    <div class="text">
+                        <h3>${elem.username}</h3>
+                        <h4 class="text-xs opacity-30 leading-none">${elem.name}</h4>
+                    </div>
+                </div>            
+            </a>`;
+                })
+                document.querySelector(".users").innerHTML=clutter;
+            })
+        
+        })
+    </script>
+</body>
+</html>
