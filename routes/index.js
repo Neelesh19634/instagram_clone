@@ -1,5 +1,11 @@
 var express = require('express');
-var router = express.Router();
+const ejs = require('ejs');
+const app = express();
+const serverless = require('serverless-http');
+const port = process.env.PORT || 3000;
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+// var app = express.app();
 const userModel=require("./users");
 const postModel=require("./post");
 const storyModel = require("./story");
@@ -10,13 +16,13 @@ const { userInfo } = require('os');
 passport.use(new localStrategy(userModel.authenticate()));
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+app.get('/', function(req, res, next) {
   res.render('index');
 });
-router.get("/login",(req,res)=>{
+app.get("/login",(req,res)=>{
   res.render("login",{err:req.flash("error")});
 })
-router.get("/profile",isLoggedIn,async (req,res)=>{
+app.get("/profile",isLoggedIn,async (req,res)=>{
   const  user=await userModel.findOne({
     username:req.session.passport.user,
   })
@@ -24,7 +30,7 @@ router.get("/profile",isLoggedIn,async (req,res)=>{
  
   res.render("profile",{footer:true,user});
 })
-router.get("/feed",isLoggedIn,async (req,res)=>{
+app.get("/feed",isLoggedIn,async (req,res)=>{
   const  user=await userModel.findOne({
     username:req.session.passport.user,
   })
@@ -43,7 +49,7 @@ router.get("/feed",isLoggedIn,async (req,res)=>{
 })
 
 
-router.get('/edit',isLoggedIn,async function(req, res, next) {
+app.get('/edit',isLoggedIn,async function(req, res, next) {
   const user=await userModel.findOne({
     username:req.session.passport.user,
   })
@@ -51,7 +57,7 @@ router.get('/edit',isLoggedIn,async function(req, res, next) {
   res.render('edit',{footer:true,user});
 });
 
-router.post("/update",upload.single("image"),async (req,res,next)=>{
+app.post("/update",upload.single("image"),async (req,res,next)=>{
   const user=await userModel.findOneAndUpdate({username:req.session.passport.user},{username:req.body.username,name:req.body.name,bio:req.body.bio},{new:true})
   if(req.file){
 
@@ -63,20 +69,20 @@ router.post("/update",upload.single("image"),async (req,res,next)=>{
 })
 
 
-router.get('/upload',isLoggedIn,async function(req, res, next) {
+app.get('/upload',isLoggedIn,async function(req, res, next) {
   const user=await userModel.findOne({
     username:req.session.passport.user,
   })
   res.render('upload',{footer:true,user})
 });
-router.get('/search',isLoggedIn,async function(req, res, next) {
+app.get('/search',isLoggedIn,async function(req, res, next) {
   const user=await userModel.findOne({
     username:req.session.passport.user,
   })
   res.render('search',{footer:true,user});
 });
 
-router.get('/likes/post/:id',isLoggedIn,async function(req, res, next) {
+app.get('/likes/post/:id',isLoggedIn,async function(req, res, next) {
   const user=await userModel.findOne({
     username:req.session.passport.user,
   })
@@ -95,13 +101,13 @@ router.get('/likes/post/:id',isLoggedIn,async function(req, res, next) {
 });
 
 
-router.get("/username/:username",isLoggedIn,async function(req, res, next) {
+app.get("/username/:username",isLoggedIn,async function(req, res, next) {
   const regex= new RegExp(`^${req.params.username}`,'i');
   const users=await userModel.find({username: regex});
  res.json(users);
 });
 
-router.post("/upload",isLoggedIn,upload.single("image"),async (req,res)=>{
+app.post("/upload",isLoggedIn,upload.single("image"),async (req,res)=>{
   const user=await userModel.findOne({
     username:req.session.passport.user,
   })
@@ -127,7 +133,7 @@ router.post("/upload",isLoggedIn,upload.single("image"),async (req,res)=>{
   res.redirect("/feed");
 })
 
-router.post("/register",(req,res)=>{
+app.post("/register",(req,res)=>{
   var userData=new userModel({
     username:req.body.username,
     email:req.body.email,
@@ -142,13 +148,13 @@ router.post("/register",(req,res)=>{
   })
 })
 
-router.post("/login",passport.authenticate("local",{
+app.post("/login",passport.authenticate("local",{
   successRedirect:"/profile",
   failureRedirect:"/login",
 
 }))
 
-router.get("/logout",(req,res,next)=>{
+app.get("/logout",(req,res,next)=>{
   req.logout(function(err){
     if(err){
       return next(err);
@@ -165,5 +171,6 @@ function isLoggedIn(req,res,next){
   }
   res.redirect("/login");
 }
-
-module.exports = router;
+const handler = serverless(app);
+module.exports.handler = handler;
+app.listen(3000);
